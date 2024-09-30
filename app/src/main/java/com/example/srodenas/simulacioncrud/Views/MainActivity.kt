@@ -8,10 +8,9 @@ import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.srodenas.simulacioncrud.Logic.Client
 import com.example.srodenas.simulacioncrud.Logic.Controller
-import com.example.srodenas.simulacioncrud.Logic.interfaces.OperationsInterface
 import com.example.srodenas.simulacioncrud.R
 
-class MainActivity : AppCompatActivity(), OperationsInterface {
+class MainActivity : AppCompatActivity(){
     private lateinit var myButtonAdd: ImageView
     private lateinit var myButtonUpdate: ImageView
     private lateinit var myButtonDel: ImageView
@@ -23,16 +22,9 @@ class MainActivity : AppCompatActivity(), OperationsInterface {
     }
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-  //      enableEdgeToEdge()  //barra superior transparente. App de borde a borde (toaaaa)
         setContentView(R.layout.activity_main)
-//        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-//            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-//            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-//            insets
-//        }
         Log. d(TAG, "Esto es un ejemplo de log")
         start()
     }
@@ -45,9 +37,18 @@ class MainActivity : AppCompatActivity(), OperationsInterface {
         myButtonAdd = findViewById(R.id.myButtonAdd)   //Recuperamos la referencia en memoria del botón de la interfaz.
         myButtonUpdate = findViewById(R.id.myButtomEdit)
         myButtonDel = findViewById(R.id.myButtomDel)
-        myDialog = Dialog(controller)
+        myDialog = Dialog(controller,
+            { id, name ->
+                clientAdd(id, name)
+            },
+            { id, name ->
+                clientUpdate(id, name)
+            },
+            { id ->
+                clientDel(id)
+            })
 
-        myDialog.setListener(this) //Le paso mi referencia como objeto que estoy obligado a implementar los tres métodos.
+
 
         myButtonAdd.setOnClickListener{
             //acepta una lambda, por tanto es una referencia a una función anónima.
@@ -68,7 +69,7 @@ class MainActivity : AppCompatActivity(), OperationsInterface {
     }
 
 
-    override fun ClientAdd(id: Int, name: String){
+    fun clientAdd(id: Int, name: String){
         val newClient = Client (id, name)
         controller.ClientAddController(newClient)
         var msg =  "El cliente con id = $id, ha sido insertado correctamente"
@@ -77,7 +78,7 @@ class MainActivity : AppCompatActivity(), OperationsInterface {
         showConsoleData(msg)
     }
 
-    override fun ClientDel(id: Int) {
+    fun clientDel(id: Int) {
         var msg = ""
         val delete = controller.ClientDelController(id)  //borramos
 
@@ -93,14 +94,14 @@ class MainActivity : AppCompatActivity(), OperationsInterface {
 
 
 
-    override fun ClientUpdate(id: Int, name: String) {
+    fun clientUpdate(id: Int, name: String) {
         var msg = ""
         val update = controller.ClientUpdateController(id, name)  //borramos el 2.
 
         if (update)
-            msg =  "El cliente con id = $id, ha sido eliminado correctamente"
+            msg =  "El cliente con id = $id, ha sido actualizado correctamente"
         else
-            msg = "El cliente con id = $id, no ha sido encontrado para eliminar"
+            msg = "El cliente con id = $id, no ha sido encontrado para actualizar"
 
         Log. d(TAG, msg)
         showConsoleData(msg)
